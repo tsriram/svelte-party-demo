@@ -1,0 +1,4 @@
+{
+  "name": "sveltekit-partykit-party",
+  "main": "party/index.ts"
+}
