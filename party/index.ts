@@ -7,7 +7,7 @@ export default class Server implements Party.Server {
 		console.log('onBeforeConnect: lobby: ', lobby.id);
 	}
 
-	onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
+	async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
 		// A websocket just connected!
 		console.log(
 			`Connected:
@@ -15,12 +15,17 @@ export default class Server implements Party.Server {
   room: ${this.party.id}
   url: ${new URL(ctx.request.url).pathname}`
 		);
-
-		// let's send a message to the connection
-		conn.send(JSON.stringify({ message: 'hello from server' }));
+		const storedData = await this.party.storage.get<string>('counter');
+		const data = storedData && JSON.parse(storedData);
+		if (data && data.count) {
+			conn.send(storedData);
+			console.log('storedData: ', storedData);
+		} else {
+			console.log('no stored data');
+		}
 	}
 
-	onMessage(message: string, sender: Party.Connection) {
+	async onMessage(message: string, sender: Party.Connection) {
 		// let's log the message
 		console.log(`connection ${sender.id} sent message: ${message}`);
 		// as well as broadcast it to all the other connections in the room...
@@ -29,7 +34,11 @@ export default class Server implements Party.Server {
 		// 	// ...except for the connection it came from
 		// 	[sender.id]
 		// );
-		this.party.broadcast(message);
+		const data = message && JSON.parse(message);
+		if (data && data.count) {
+			await this.party.storage.put('counter', message);
+		}
+		this.party.broadcast(message, [sender.id]);
 	}
 }
 
