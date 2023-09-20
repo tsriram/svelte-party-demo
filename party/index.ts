@@ -18,7 +18,8 @@ export default class Server implements Party.Server {
 
 	async onRequest(req: Party.Request) {
 		// for all HTTP requests, respond with the current count
-		return json(JSON.stringify({ count: this.count }));
+		const playerCount = [...this.party.getConnections()].length;
+		return json(JSON.stringify({ count: this.count, playerCount }));
 	}
 
 	async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
