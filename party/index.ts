@@ -34,11 +34,9 @@ export default class Server implements Party.Server {
 
 	async onMessage(message: string, sender: Party.Connection) {
 		const data = message && JSON.parse(message);
-		if (data && data.count) {
-			this.count = data.count;
-			await this.party.storage.put('count', this.count);
-			this.party.broadcast(JSON.stringify({ count: this.count }), [sender.id]);
-		}
+		this.count = data?.count || 0;
+		await this.party.storage.put('count', this.count);
+		this.party.broadcast(JSON.stringify({ count: this.count }), [sender.id]);
 	}
 }
 
