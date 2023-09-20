@@ -5,10 +5,18 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	const host = PUBLIC_PARTYKIT_HOST;
 	const room = PUBLIC_PARTYKIT_ROOM;
 	const partykitUrl = `${host}/party/${room}`;
-	console.log('partykitUrl: ', partykitUrl);
-	const response = await fetch(partykitUrl);
-	const data = await response.json();
+	// fallback count to 0
+	let count = 0;
+	try {
+		const response = await fetch(partykitUrl);
+		const data = await response.json();
+		if (data && data.count) {
+			count = data.count;
+		}
+	} catch (error) {
+		console.error(`Error fetching count from PartyKit: ${error}`);
+	}
 	return {
-		count: data?.count || 0
+		count
 	};
 };
