@@ -3,6 +3,33 @@
 	import type { PageServerData } from './$types';
 
 	export let data: PageServerData;
+	import PartySocket from 'partysocket';
+	import { PUBLIC_PARTYKIT_HOST, PUBLIC_PARTYKIT_ROOM } from '$env/static/public';
+	let count = data.count || 0;
+	let playerCount = data.playerCount || 0;
+
+	const socket = new PartySocket({
+		host: PUBLIC_PARTYKIT_HOST,
+		room: PUBLIC_PARTYKIT_ROOM
+	});
+
+	socket.addEventListener('message', (event) => {
+		const data = JSON.parse(event.data);
+		if (!isNaN(data?.count)) {
+			count = data?.count;
+		}
+		playerCount = data.playerCount;
+	});
+
+	function increment() {
+		count += 1;
+		socket.send(JSON.stringify({ count }));
+	}
+
+	function decrement() {
+		count -= 1;
+		socket.send(JSON.stringify({ count }));
+	}
 </script>
 
 <svelte:head>
@@ -12,10 +39,10 @@
 
 <section>
 	<h1>
-		<span class="welcome"> SvelteKit + PartyKit Demo 🎈 </span>
+		<span class="welcome"> SvelteKit + PartyKit Demo = {playerCount} 🎈</span>
 	</h1>
 
-	<Counter count={data.count} />
+	<Counter {count} {increment} {decrement} />
 </section>
 
 <style>

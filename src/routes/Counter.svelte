@@ -1,30 +1,9 @@
 <script lang="ts">
 	import { spring } from 'svelte/motion';
-	import PartySocket from 'partysocket';
 	export let count = 0;
-	import { PUBLIC_PARTYKIT_HOST, PUBLIC_PARTYKIT_ROOM } from '$env/static/public';
 
-	const socket = new PartySocket({
-		host: PUBLIC_PARTYKIT_HOST,
-		room: PUBLIC_PARTYKIT_ROOM
-	});
-
-	socket.addEventListener('message', (event) => {
-		const data = JSON.parse(event.data);
-		if (!isNaN(data?.count)) {
-			count = data?.count;
-		}
-	});
-
-	function increment() {
-		count += 1;
-		socket.send(JSON.stringify({ count }));
-	}
-
-	function decrement() {
-		count -= 1;
-		socket.send(JSON.stringify({ count }));
-	}
+	export let increment: () => void;
+	export let decrement: () => void;
 
 	const displayed_count = spring();
 	$: displayed_count.set(count);

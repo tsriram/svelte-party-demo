@@ -30,14 +30,21 @@ export default class Server implements Party.Server {
   room: ${this.party.id}
   url: ${new URL(ctx.request.url).pathname}`
 		);
-		conn.send(JSON.stringify({ count: this.count }));
+		const playerCount = [...this.party.getConnections()].length;
+		this.party.broadcast(JSON.stringify({ count: this.count, playerCount }));
+	}
+
+	onClose(connection: Party.Connection): void | Promise<void> {
+		const playerCount = [...this.party.getConnections()].length;
+		this.party.broadcast(JSON.stringify({ count: this.count, playerCount }));
 	}
 
 	async onMessage(message: string, sender: Party.Connection) {
 		const data = message && JSON.parse(message);
 		this.count = data?.count || 0;
 		await this.party.storage.put('count', this.count);
-		this.party.broadcast(JSON.stringify({ count: this.count }), [sender.id]);
+		const playerCount = [...this.party.getConnections()].length;
+		this.party.broadcast(JSON.stringify({ count: this.count, playerCount }), [sender.id]);
 	}
 }
 
