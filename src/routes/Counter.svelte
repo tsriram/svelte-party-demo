@@ -1,18 +1,17 @@
 <script lang="ts">
 	import { spring } from 'svelte/motion';
 	import PartySocket from 'partysocket';
+	export let count = 0;
+	import { PUBLIC_PARTYKIT_HOST, PUBLIC_PARTYKIT_ROOM } from '$env/static/public';
 
 	const socket = new PartySocket({
-		host: 'localhost:1999',
-		room: 'sveltekit-test'
+		host: PUBLIC_PARTYKIT_HOST,
+		room: PUBLIC_PARTYKIT_ROOM
 	});
 
-	let count = 0;
 	socket.addEventListener('message', (event) => {
 		const data = JSON.parse(event.data);
-		console.log('Event count: ', data);
 		if (!isNaN(data?.count)) {
-			console.log('setting count');
 			count = data?.count;
 		}
 	});
@@ -30,7 +29,6 @@
 	const displayed_count = spring();
 	$: displayed_count.set(count);
 	$: offset = modulo($displayed_count, 1);
-	// $: socket.send(JSON.stringify({ count }));
 	function modulo(n: number, m: number) {
 		// handle negative numbers
 		return ((n % m) + m) % m;

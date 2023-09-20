@@ -1,7 +1,10 @@
-<script>
+<script lang="ts">
 	import Counter from './Counter.svelte';
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	import type { PageServerData } from './$types';
+
+	export let data: PageServerData;
 </script>
 
 <svelte:head>
@@ -25,7 +28,7 @@
 		try editing <strong>src/routes/+page.svelte</strong>
 	</h2>
 
-	<Counter />
+	<Counter count={data.count} />
 </section>
 
 <style>
