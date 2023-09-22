@@ -19,5 +19,5 @@ jobs:
       - run: npm ci
       - run: npx partykit deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PARTYKIT_GITHUB_TOKEN }}
           GITHUB_LOGIN: ${{ github.actor }}
